@@ -12,6 +12,7 @@ import android.os.Bundle;
 import java.util.Optional;
 import java.util.Set;
 
+import static android.bluetooth.BluetoothAdapter.getDefaultAdapter;
 import static androidx.core.app.ActivityCompat.startActivityForResult;
 
 
@@ -26,7 +27,7 @@ public final class BluetoothPairer {
 
     public BluetoothPairer(Activity activity) {
         this.activity = activity;
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothAdapter bluetoothAdapter = getDefaultAdapter();
         if (bluetoothAdapter == null) {
             // Device doesn't support Bluetooth
             throw new UnsupportedOperationException("Bluetooth is mandatory for app");
@@ -47,13 +48,13 @@ public final class BluetoothPairer {
         }
 
 
-        BluetoothAdapter.getDefaultAdapter().startDiscovery();
+        getDefaultAdapter().startDiscovery();
         BroadcastReceiver receiver = getBroadcastReceiver();
         try {
             activity.registerReceiver(receiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
         } finally {
             activity.unregisterReceiver(receiver);
-            BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+            getDefaultAdapter().cancelDiscovery();
         }
 
     }
@@ -73,7 +74,7 @@ public final class BluetoothPairer {
                     arduinoDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
                     activity.unregisterReceiver(this);
-                    BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+                    getDefaultAdapter().cancelDiscovery();
                 }
 
             }
