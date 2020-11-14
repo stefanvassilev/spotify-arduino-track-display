@@ -14,8 +14,11 @@ public class BluetoothServer implements Runnable {
 
     public static final String TAG = "bluetooth socket";
     private final BluetoothServerSocket mmServerSocket;
+    private final BluetoothPairer bluetoothPairer;
+    private ArduinoService arduinoService;
 
-    public BluetoothServer() {
+    public BluetoothServer(BluetoothPairer bluetoothPairer) {
+        this.bluetoothPairer = bluetoothPairer;
         // Use a temporary object that is later assigned to mmServerSocket
         // because mmServerSocket is final.
         BluetoothServerSocket tmp = null;
@@ -44,10 +47,7 @@ public class BluetoothServer implements Runnable {
             if (socket != null) {
                 // A connection was accepted. Perform work associated with
                 // the connection in a separate thread.
-
-                //TODO: Trigger event for arduino socket to become active or init method start threads
-                ArduinoService.getInstance().init(socket);
-                manageMyConnectedSocket(socket)
+                arduinoService = new ArduinoService(bluetoothPairer.getMainHandler(), socket);
                 try {
                     mmServerSocket.close();
                 } catch (IOException e) {

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 
 import java.util.Arrays;
@@ -28,9 +29,11 @@ public final class BluetoothPairer {
     private final Activity activity;
 
     private BluetoothDevice arduinoDevice;
+    private final Handler mainHandler;
 
-    public BluetoothPairer(Activity activity) {
+    public BluetoothPairer(Activity activity, Handler mainHandler) {
         this.activity = activity;
+        this.mainHandler = mainHandler;
         BluetoothAdapter bluetoothAdapter = getDefaultAdapter();
         if (bluetoothAdapter == null) {
             Log.i(TAG_NAME, "Device does not support bluetooth");
@@ -54,13 +57,17 @@ public final class BluetoothPairer {
 
 
         Log.i(TAG_NAME, "Starting adapter discovery");
-        getDefaultAdapter().startDiscovery();
+        boolean success = getDefaultAdapter().startDiscovery();
+        if (!success) {
+            throw new IllegalStateException("Failed to start bluetooth discovery");
+        }
+
         BroadcastReceiver receiver = getBroadcastReceiver();
         try {
             activity.registerReceiver(receiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
         } finally {
-            activity.unregisterReceiver(receiver);
-            getDefaultAdapter().cancelDiscovery();
+//            activity.unregisterReceiver(receiver);
+//            getDefaultAdapter().cancelDiscovery();
         }
 
     }
@@ -70,14 +77,18 @@ public final class BluetoothPairer {
         return Optional.of(arduinoDevice);
     }
 
+    public Handler getMainHandler() {
+        return mainHandler;
+    }
+
     private BroadcastReceiver getBroadcastReceiver() {
         return new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-                Log.i(TAG_NAME, "Broadcast reciever: " + intent.getAction());
+                Log.i(TAG_NAME, "Broadcast receiver: " + intent.getAction());
                 if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
                     BluetoothDevice foundDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    Log.i(TAG_NAME, "Found device with name: " + foundDevice.getName() + " and address: " + foundDevice.getAddress());
                     if (ARDUINO_BLUETOOTH_DEVICE_NAME.equals(foundDevice.getName())) {
                         Log.i(TAG_NAME, "Found arduino device");
                         arduinoDevice = foundDevice;

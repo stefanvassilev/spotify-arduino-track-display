@@ -7,6 +7,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 public class ArduinoService {
 
@@ -18,57 +19,43 @@ public class ArduinoService {
     private Thread handleReceiveDataThread;
     private final Handler handler;
 
-    public ArduinoService(Handler handler) {
+    public ArduinoService(Handler handler, BluetoothSocket bluetoothSocket) {
         this.handler = handler;
-    }
-
-
-    private static final ArduinoService instance = new ArduinoService();
-
-
-    public void init(BluetoothSocket bluetoothSocket) {
         if (bluetoothSocket == null) {
             throw new IllegalArgumentException("socket cannot be null");
         }
         this.socket = bluetoothSocket;
         this.handleReceiveDataThread = new Thread(this::receiveData);
-
     }
 
-    public static ArduinoService getInstance() {
-        return instance;
-    }
 
     public void receiveData() {
-        try {
-            byte[] buff = new byte[4096];
-            try (InputStream input = socket.getInputStream()) {
+        while (true) {
+            {
+                byte[] buff = new byte[4096];
+                try (InputStream input = socket.getInputStream()) {
 
-                int numBytes = input.read(buff);
-                // Send the obtained bytes to the UI activity.
-                Message readMsg = handler.obtainMessage(
-                        MESSAGE_READ, numBytes, -1,
-                        buff);
-                readMsg.sendToTarget();
+                    int numBytes = input.read(buff);
+                    // Send the obtained bytes to the UI activity.
+                    Message readMsg = handler.obtainMessage(
+                            MESSAGE_READ, numBytes, -1,
+                            buff);
+                    readMsg.sendToTarget();
 
+                } catch (IOException e) {
+                    Log.e("arduino socket", "failed to receive data", e);
+                    break;
+                }
             }
-        } catch (IOException e) {
-            Log.e("arduino socket", "failed to receive data", e);
         }
-        ;
-
-
-        if (socket == null) {
-            throw new IllegalStateException("Bluetooth socket not initialized");
-        }
-
     }
 
-    public void sendData() {
-        if (socket == null) {
-            throw new IllegalStateException("Bluetooth socket not initialized");
+    public void sendData(byte[] data) {
+        try (OutputStream os = this.socket.getOutputStream()) {
+            os.write(data);
+        } catch (IOException e) {
+            Log.e("arduino socket", "Failed to send data", e);
         }
-
     }
 
 }
