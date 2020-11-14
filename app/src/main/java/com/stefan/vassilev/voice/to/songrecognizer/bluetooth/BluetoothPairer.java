@@ -63,12 +63,7 @@ public final class BluetoothPairer {
         }
 
         BroadcastReceiver receiver = getBroadcastReceiver();
-        try {
-            activity.registerReceiver(receiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-        } finally {
-//            activity.unregisterReceiver(receiver);
-//            getDefaultAdapter().cancelDiscovery();
-        }
+        activity.registerReceiver(receiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 
     }
 
