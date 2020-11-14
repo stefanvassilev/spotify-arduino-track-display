@@ -3,6 +3,8 @@ package com.stefan.vassilev.voice.to.songrecognizer;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +21,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String BLUETOOTH_SERVICE_NAME = "songrecognizer";
     public static final UUID BLUETOOTH_SERVICE_GUID = UUID.fromString("03a111ae-2683-11eb-adc1-0242ac120002");
 
+    private EditText editTextMultiline;
+    private Button sendTextButton;
+    private Button clearTextButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,8 +33,13 @@ public class MainActivity extends AppCompatActivity {
         BluetoothServer bluetoothServer = new BluetoothServer(bluetoothPairer);
         new Thread(bluetoothServer).start();
 
-
         setContentView(R.layout.activity_main);
+        editTextMultiline = findViewById(R.id.editTextTextMultiLine);
+        sendTextButton = findViewById(R.id.button_send_text);
+        clearTextButton = findViewById(R.id.button_clear_text);
+        clearTextButton.setOnClickListener(v -> {
+            editTextMultiline.setText("");
+        });
     }
 
 
