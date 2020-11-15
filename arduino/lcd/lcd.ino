@@ -38,16 +38,14 @@ void scrollText(const String s, int row, DFRobot_LCD& lcd) {
       stringToPrint = s.substring(i, min(s_len, 16 + i));
       lcd.print(stringToPrint);
       lcd.setCursor(0, row);
-      delay(1000);
+      delay(1500);
       clearRow(row, lcd);
     }
-    
+
   } else {
+    lcd.setCursor(0, row);
     lcd.print(s);
   }
-  
-
-  
 }
 
 
@@ -57,15 +55,15 @@ void setup() {
   lcd.init();
 
   r = 255;
-  g = 255;
+  g = 0;
   b = 255;
   t=t *3;
   lcd.setRGB(r, g, b);                  //Set R,G,B Value
-  lcd.setCursor(0,0); 
+  lcd.setCursor(0,0);
 
 }
 
 void loop() {
-  scrollText("zdr kpr n6 ti,smislen tekst, kojto moje da se prosledi dosta po-dobre", 0, lcd);
+  scrollText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed viverra eu turpis ut viverra", 0, lcd);
   delay(300);
 }
