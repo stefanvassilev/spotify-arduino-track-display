@@ -12,7 +12,7 @@
         android:layout_marginStart="132dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="123dp"
-        android:text="Song recognizer App"
+        android:text="Arduino Spotify LCD App"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
