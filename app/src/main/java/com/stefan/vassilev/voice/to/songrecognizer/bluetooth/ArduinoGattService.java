@@ -1,7 +1,9 @@
 package com.stefan.vassilev.voice.to.songrecognizer.bluetooth;
 
 import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.polidea.rxandroidble2.RxBleConnection;
 import com.polidea.rxandroidble2.RxBleDevice;
@@ -18,13 +20,12 @@ public class ArduinoGattService {
 
     private static final String TAG = ArduinoGattService.class.getName();
 
-    private static final String ARDUINO_SERVICE = "5bcc5572-2783-11eb-adc1-0242ac120002";
-
     private final Activity activity;
     private final RxBleDevice bluetoothDevice;
 
-    private PublishSubject<Boolean> disconnectTriggerSubject = PublishSubject.create();
+    private final PublishSubject<Boolean> disconnectTriggerSubject = PublishSubject.create();
     private final Observable<RxBleConnection> rxBleConnectionObservable;
+    private final Context context;
 
 
     public ArduinoGattService(Activity activity, RxBleDevice bluetoothDevice) {
@@ -40,39 +41,22 @@ public class ArduinoGattService {
         }
 
 
-        while (true) {
-            toggleLEDIndefinetely(1);
-            toggleLEDIndefinetely(0);
-        }
+        context = activity.getApplicationContext().getApplicationContext();
 
     }
 
-    private void toggleLEDIndefinetely(int val) {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public void writeCharacteristic(UUID charId, byte[] data) {
         Disposable subscribe = rxBleConnectionObservable
-                .flatMapSingle(rxBleConnection -> rxBleConnection.writeCharacteristic(UUID.fromString(ARDUINO_SERVICE), new byte[]{(byte) val}))
+                .flatMapSingle(rxBleConnection -> rxBleConnection.writeCharacteristic(charId, data))
                 .subscribe(
                         characteristicValue -> {
-                            Log.w(TAG, "success" + Arrays.toString(characteristicValue));
-                            // Characteristic value confirmed.
+                            Log.i(TAG, "success" + Arrays.toString(characteristicValue));
                         },
                         throwable -> {
                             Log.e(TAG, "error", throwable);
-                            // Handle an error here.
+                            Toast.makeText(context, "error" + throwable, Toast.LENGTH_LONG).show();
                         }
                 );
-
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-
     }
 
 
