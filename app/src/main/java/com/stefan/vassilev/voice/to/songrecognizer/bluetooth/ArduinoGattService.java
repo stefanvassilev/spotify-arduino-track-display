@@ -1,6 +1,5 @@
 package com.stefan.vassilev.voice.to.songrecognizer.bluetooth;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
@@ -20,7 +19,6 @@ public class ArduinoGattService {
 
     private static final String TAG = ArduinoGattService.class.getName();
 
-    private final Activity activity;
     private final RxBleDevice bluetoothDevice;
 
     private final PublishSubject<Boolean> disconnectTriggerSubject = PublishSubject.create();
@@ -28,9 +26,8 @@ public class ArduinoGattService {
     private final Context context;
 
 
-    public ArduinoGattService(Activity activity, RxBleDevice bluetoothDevice) {
+    public ArduinoGattService(Context context, RxBleDevice bluetoothDevice) {
         Log.i(TAG, "Creating arduino service");
-        this.activity = activity;
         this.bluetoothDevice = bluetoothDevice;
 
         rxBleConnectionObservable = prepareConnectionObservable();
@@ -40,9 +37,7 @@ public class ArduinoGattService {
             e.printStackTrace();
         }
 
-
-        context = activity.getApplicationContext().getApplicationContext();
-
+        this.context = context;
     }
 
     public void writeCharacteristic(UUID charId, byte[] data) {
@@ -60,11 +55,6 @@ public class ArduinoGattService {
     }
 
 
-    private boolean isConnected() {
-        return bluetoothDevice.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED;
-    }
-
-
     private Observable<RxBleConnection> prepareConnectionObservable() {
         return bluetoothDevice
                 .establishConnection(false)
@@ -72,8 +62,4 @@ public class ArduinoGattService {
                 .compose(new ConnectionSharingAdapter());
     }
 
-
-    private void triggerDisconnect() {
-        disconnectTriggerSubject.onNext(true);
-    }
 }

@@ -24,13 +24,13 @@ public class MainActivity extends AppCompatActivity {
 
     private ArduinoService arduinoService;
     private SpotifyBroadCastReceiver spotifyBroadCastReceiver;
+    private ArduinoBluetoothLeService bluetoothLeService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ArduinoBluetoothLeService bluetoothLeService = new ArduinoBluetoothLeService(this, this::initalizeArduinoServices);
-
+        bluetoothLeService = new ArduinoBluetoothLeService(this, this::initalizeArduinoServices);
         IntentFilter filter = new IntentFilter("com.spotify.music.metadatachanged");
         this.registerReceiver(spotifyBroadCastReceiver, filter);
 
