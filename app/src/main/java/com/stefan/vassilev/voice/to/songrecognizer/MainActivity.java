@@ -4,7 +4,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.SeekBar;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,20 +16,12 @@ import com.stefan.vassilev.voice.to.songrecognizer.bluetooth.ArduinoGattService;
 import com.stefan.vassilev.voice.to.songrecognizer.service.ArduinoService;
 import com.stefan.vassilev.voice.to.songrecognizer.service.SpotifyBroadCastReceiver;
 
-import java.util.UUID;
-
 import static com.stefan.vassilev.voice.to.songrecognizer.bluetooth.ArduinoBluetoothLeService.REQUEST_ENABLE_BT;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final UUID BLUETOOTH_SERVICE_GUID = UUID.fromString("5bcc5572-2783-11eb-adc1-0242ac120002");
-
     private ArduinoGattService arduinoGattService;
 
-    private EditText editTextMultiline;
-    private Button sendTextButton;
-    private Button clearTextButton;
-    private ArduinoBluetoothLeService bluetoothLeService;
     private ArduinoService arduinoService;
     private SpotifyBroadCastReceiver spotifyBroadCastReceiver;
 
@@ -36,17 +29,22 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        bluetoothLeService = new ArduinoBluetoothLeService(this, this::initalizeArduinoServices);
+        ArduinoBluetoothLeService bluetoothLeService = new ArduinoBluetoothLeService(this, this::initalizeArduinoServices);
 
         IntentFilter filter = new IntentFilter("com.spotify.music.metadatachanged");
         this.registerReceiver(spotifyBroadCastReceiver, filter);
 
         setContentView(R.layout.activity_main);
-        editTextMultiline = findViewById(R.id.editTextTextMultiLine);
-        sendTextButton = findViewById(R.id.button_send_text);
-        clearTextButton = findViewById(R.id.button_clear_text);
-        clearTextButton.setOnClickListener(v -> {
-            editTextMultiline.setText("");
+        Button updateRgb = findViewById(R.id.button_send_text);
+
+        updateRgb.setOnClickListener((e) -> {
+            SeekBar redSeekBar = findViewById(R.id.RedValueSeekBar);
+            SeekBar greenSeekBar = findViewById(R.id.GreenValueSeekBar);
+            SeekBar blueSeekBar = findViewById(R.id.BlueValueSeekBar);
+            arduinoService.updateLcdBacklight(redSeekBar.getProgress(), greenSeekBar.getProgress(), blueSeekBar.getProgress());
+
+            Toast.makeText(this, "Updating r,g,b with: " + "(" + redSeekBar.getProgress() + ", " + greenSeekBar.getProgress() + "," + blueSeekBar.getProgress() + ")",
+                    Toast.LENGTH_SHORT).show();
         });
     }
 

@@ -24,6 +24,12 @@ public class ArduinoService {
         sendCharByChar(ArduinoServiceCharacteristics.SONG_ARTIST.getUuid(), songAuthor.getBytes(StandardCharsets.UTF_8));
     }
 
+    public void updateLcdBacklight(int r, int g, int b) {
+        arduinoGattService.writeCharacteristic(ArduinoServiceCharacteristics.LCD_RED_VALUE.getUuid(), new byte[]{(byte) r});
+        arduinoGattService.writeCharacteristic(ArduinoServiceCharacteristics.LCD_GREEN_VALUE.getUuid(), new byte[]{(byte) g});
+        arduinoGattService.writeCharacteristic(ArduinoServiceCharacteristics.LCD_BLUE_VALUE.getUuid(), new byte[]{(byte) b});
+    }
+
     private void sendCharByChar(UUID charUuid, byte[] data) {
         byte[] controlChar = new byte[]{0};
         arduinoGattService.writeCharacteristic(charUuid, controlChar);
