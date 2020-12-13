@@ -38,8 +38,7 @@ public final class SpotifyBroadCastReceiver extends BroadcastReceiver {
             case BroadcastTypes.PLAYBACK_STATE_CHANGED:
                 boolean playing = intent.getBooleanExtra("playing", false);
                 int positionInMs = intent.getIntExtra("playbackPosition", 0);
-                Log.i(TAG, "TODO song play status changed");
-
+                Log.i(TAG, "Song play status changed");
             default:
                 Log.w(TAG, "Event not being processed: " + action);
         }
