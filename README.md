@@ -1,5 +1,6 @@
 
-# Arduino Spotify LCD
+# Arduino Spotify Track Display
+
 
 
 This project contains source code for an android application and Arduino sketches used to create a LCD tracked of the currently playing song on Spotify.
