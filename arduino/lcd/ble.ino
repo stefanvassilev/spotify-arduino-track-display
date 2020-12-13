@@ -17,6 +17,10 @@ BLEByteCharacteristic switchCharacteristic("5bcc5572-2783-11eb-adc1-0242ac120002
 BLEByteCharacteristic trackNameChar("8cf44e98-3c69-11eb-adc1-0242ac120002", BLERead | BLEWrite);
 BLEByteCharacteristic songAuthorChar("cbcad3ee-3c69-11eb-adc1-0242ac120002", BLERead | BLEWrite);
 
+BLEIntCharacteristic redLcdChar("c48e58d8-3d3d-11eb-adc1-0242ac120002", BLERead | BLEWrite);
+BLEIntCharacteristic blueLcdChar("d933cb10-3d3d-11eb-adc1-0242ac120002", BLERead | BLEWrite);
+BLEIntCharacteristic greenLcdChar("e11a7ffe-3d3d-11eb-adc1-0242ac120002", BLERead | BLEWrite);
+
 
 // LED initialization
 DFRobot_LCD lcd(16,2);  //16 characters and 2 lines of show
@@ -54,6 +58,10 @@ void setup() {
     songService.addCharacteristic(switchCharacteristic);
     songService.addCharacteristic(trackNameChar);
     songService.addCharacteristic(songAuthorChar);
+    songService.addCharacteristic(redLcdChar);
+    songService.addCharacteristic(greenLcdChar);
+    songService.addCharacteristic(blueLcdChar);
+
 
     BLE.addService(songService);
 
@@ -68,6 +76,10 @@ void setup() {
   // assign event handlers for characteristics
   trackNameChar.setEventHandler(BLEWritten, trackNameCharWritten);
   songAuthorChar.setEventHandler(BLEWritten, authorCharWritten);
+
+  redLcdChar.setEventHandler(BLEWritten, redLcdChanged);
+  blueLcdChar.setEventHandler(BLEWritten, redLcdChanged);
+  greenLcdChar.setEventHandler(BLEWritten, redLcdChanged);
 
   // set an initial value for the characteristic
   switchCharacteristic.setValue(0);
@@ -96,6 +108,23 @@ void loop() {
 
 void pollBle() {
     BLE.poll();
+}
+
+void redLcdChanged(BLEDevice central, BLECharacteristic characteristic) {
+    r = redLcdChar.value();
+    lcd.setRGB(r,g,b);
+}
+
+
+void blueLcdChanged(BLEDevice central, BLECharacteristic characteristic) {
+    b = blueLcdChar.value();
+    lcd.setRGB(r,g,b);
+}
+
+
+void greenLcdChanged(BLEDevice central, BLECharacteristic characteristic) {
+    g = greenLcdChar.value();
+    lcd.setRGB(r,g,b);
 }
 
 
